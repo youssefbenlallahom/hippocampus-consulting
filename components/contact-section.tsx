@@ -23,8 +23,10 @@ export function ContactSection() {
   // Ouvre un brouillon Gmail avec les infos du formulaire
   function openGmailDraft({ name, email, company, message }: typeof formData) {
     const to = "contact@hippocampus-consulting.tn"
-    const subject = `Demande de consultation - ${company || name || ""}`.trim()
-    const bodyPlain = `Nom: ${name}\nEmail: ${email}\nEntreprise: ${company || "Non spécifiée"}\n\nMessage:\n${message}\n\nCordialement,\n${name}`
+    // Sujet simplifié sans suffixe
+    const subject = "Demande de consultation"
+    // Corps: uniquement le message + signature
+    const bodyPlain = `${message}\n\nCordialement,\n${name}`
     const su = encodeURIComponent(subject)
     const body = encodeURIComponent(bodyPlain)
     const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${body}`
@@ -140,7 +142,7 @@ export function ContactSection() {
                     disabled={isSubmitting}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground animate-pulse-glow"
                   >
-                    {isSubmitting ? "Ouverture..." : "Ouvrir dans Gmail"}
+                    {isSubmitting ? "Ouverture..." : "Envoyer la Demande"}
                     <Send className="ml-2 w-5 h-5" />
                   </Button>
                 </form>
