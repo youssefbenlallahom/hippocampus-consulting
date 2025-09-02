@@ -40,7 +40,8 @@ export function HeroSection() {
         ></div>
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      {/* Added extra top padding to push the heading plus bas */}
+      <div className="container mx-auto px-4 pb-20 pt-40 md:pt-52 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Main Heading */}
           <h1

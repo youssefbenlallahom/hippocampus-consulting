@@ -20,41 +20,26 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Ouvre un brouillon Gmail avec les infos du formulaire
+  function openGmailDraft({ name, email, company, message }: typeof formData) {
+    const to = "contact@hippocampus-consulting.tn"
+    const subject = `Demande de consultation - ${company || name || ""}`.trim()
+    const bodyPlain = `Nom: ${name}\nEmail: ${email}\nEntreprise: ${company || "Non spécifiée"}\n\nMessage:\n${message}\n\nCordialement,\n${name}`
+    const su = encodeURIComponent(subject)
+    const body = encodeURIComponent(bodyPlain)
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${body}`
+    window.open(url, "_blank", "noopener,noreferrer")
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.name || !formData.email || !formData.message) return
     setIsSubmitting(true)
-
-    try {
-      const subject = encodeURIComponent(`Demande de consultation - ${formData.company || formData.name}`)
-      const body = encodeURIComponent(`
-Bonjour,
-
-Je souhaite prendre contact avec Hippocampus Consulting pour une consultation.
-
-Informations de contact:
-- Nom: ${formData.name}
-- Email: ${formData.email}
-- Entreprise: ${formData.company || "Non spécifiée"}
-
-Message:
-${formData.message}
-
-Cordialement,
-${formData.name}
-      `)
-
-      const mailtoLink = `mailto:contact@hippocampus-consulting.tn?subject=${subject}&body=${body}`
-
-      window.location.href = mailtoLink
-
-      setIsSubmitted(true)
-      setTimeout(() => setIsSubmitted(false), 5000)
-      setFormData({ name: "", email: "", company: "", message: "" })
-    } catch (error) {
-      console.error("Error sending email:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+    openGmailDraft(formData)
+    setIsSubmitted(true)
+    setFormData({ name: "", email: "", company: "", message: "" })
+    setTimeout(() => setIsSubmitted(false), 5000)
+    setTimeout(() => setIsSubmitting(false), 600) // petite pause d'état
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -84,16 +69,16 @@ ${formData.name}
             <CardHeader>
               <CardTitle className="text-2xl text-foreground">Demande de Consultation</CardTitle>
               <CardDescription>
-                Remplissez ce formulaire et nous vous recontacterons dans les plus brefs délais.
+                Remplissez ce formulaire et un brouillon Gmail sera ouvert avec votre message.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isSubmitted ? (
                 <div className="text-center py-8 animate-fade-in-up">
                   <CheckCircle className="w-16 h-16 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Email ouvert !</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Brouillon ouvert !</h3>
                   <p className="text-muted-foreground">
-                    Votre client email s'est ouvert avec votre message pré-rempli. Envoyez-le pour nous contacter.
+                    Un nouvel onglet Gmail s'est ouvert avec votre message pré-rempli. Vérifiez et cliquez sur Envoyer.
                   </p>
                 </div>
               ) : (
@@ -155,7 +140,7 @@ ${formData.name}
                     disabled={isSubmitting}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground animate-pulse-glow"
                   >
-                    {isSubmitting ? "Ouverture..." : "Envoyer le message"}
+                    {isSubmitting ? "Ouverture..." : "Ouvrir dans Gmail"}
                     <Send className="ml-2 w-5 h-5" />
                   </Button>
                 </form>
