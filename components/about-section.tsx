@@ -29,12 +29,7 @@ const timeline = [
   },
 ]
 
-const stats = [
-  { label: "Années d'Expertise", value: "10+", icon: Award },
-  { label: "Clients Satisfaits", value: "50+", icon: Users },
-  { label: "Projets Réalisés", value: "100+", icon: Target },
-  { label: "Pays Couverts", value: "5+", icon: Globe },
-]
+
 
 export function AboutSection() {
   const [visibleItems, setVisibleItems] = useState<number[]>([])
@@ -71,33 +66,6 @@ export function AboutSection() {
             Hippocampus Consulting est votre partenaire de confiance pour le développement et la transformation de votre
             entreprise, avec une expertise reconnue dans le conseil en affaires et gestion.
           </p>
-        </div>
-
-        {/* Company Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon
-            const isVisible = visibleItems.includes(index)
-
-            return (
-              <Card
-                key={index}
-                data-index={index}
-                className={`text-center p-6 hover:shadow-lg transition-all duration-500 hover:-translate-y-1 ${
-                  isVisible ? "animate-fade-in-up" : "opacity-0"
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardContent className="p-0">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold text-foreground mb-2">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </CardContent>
-              </Card>
-            )
-          })}
         </div>
 
         {/* Company Information */}
