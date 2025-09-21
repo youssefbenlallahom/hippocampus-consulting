@@ -27,7 +27,7 @@ export function ContactSection() {
 
   // Fonction combinée pour envoyer un email selon la plateforme
   function sendEmail({ name, email, company, message }: typeof formData) {
-    const to = "contact@hippocampus-consulting.tn"
+    const to = "hippocampusconsultingtunisia@gmail.com"
     const subject = "Demande de consultation"
     const bodyPlain = `${message}\n\nCordialement,\n${name}\nEmail: ${email}${company ? `\nEntreprise: ${company}` : ''}`
     
@@ -192,10 +192,10 @@ export function ContactSection() {
                   <div>
                     <h4 className="font-semibold text-foreground text-sm sm:text-base">Email</h4>
                     <a
-                      href="mailto:contact@hippocampus-consulting.tn"
+                      href="mailto:hippocampusconsultingtunisia@gmail.com"
                       className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm break-all"
                     >
-                      contact@hippocampus-consulting.tn
+                      hippocampusconsultingtunisia@gmail.com
                     </a>
                   </div>
                 </div>
