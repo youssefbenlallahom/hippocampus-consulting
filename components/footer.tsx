@@ -110,10 +110,10 @@ export function Footer() {
                 <div>
                   <p className="text-xs md:text-sm font-medium text-foreground">Email</p>
                   <a
-                    href="mailto:contact@hippocampus-consulting.tn"
+                    href="mailto:hippocampusconsultingtunisia@gmail.com"
                     className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors break-all"
                   >
-                    contact@hippocampus-consulting.tn
+                    hippocampusconsultingtunisia@gmail.com
                   </a>
                 </div>
               </div>
