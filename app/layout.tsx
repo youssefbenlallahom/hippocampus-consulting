@@ -5,9 +5,14 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
+  title: 'Hippocampus Consulting',
   description: 'Created with v0',
   generator: 'v0.app',
+  icons: {
+    icon: '/images/hippocampus-logo-onlget.png',
+    shortcut: '/images/hippocampus-logo-onlget.png',
+    apple: '/images/hippocampus-logo-onlget.png',
+  },
 }
 
 export default function RootLayout({
