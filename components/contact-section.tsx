@@ -20,39 +20,53 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Fonction pour détecter si on est sur mobile
-  function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  }
+  // Fonction pour envoyer l'email directement via l'API
+  async function sendEmailDirect({ name, email, company, message }: typeof formData) {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          company,
+          message,
+        }),
+      })
 
-  // Fonction combinée pour envoyer un email selon la plateforme
-  function sendEmail({ name, email, company, message }: typeof formData) {
-    const to = "hippocampusconsultingtunisia@gmail.com"
-    const subject = "Demande de consultation"
-    const bodyPlain = `${message}\n\nCordialement,\n${name}\nEmail: ${email}${company ? `\nEntreprise: ${company}` : ''}`
-    
-    if (isMobileDevice()) {
-      // Sur mobile : utiliser mailto pour ouvrir l'app mail native
-      const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyPlain)}`
-      window.location.href = mailtoUrl
-    } else {
-      // Sur desktop : garder Gmail
-      const su = encodeURIComponent(subject)
-      const body = encodeURIComponent(bodyPlain)
-      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${body}`
-      window.open(url, "_blank", "noopener,noreferrer")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de l\'envoi')
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('Erreur:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Erreur inconnue' }
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.message) return
+    
     setIsSubmitting(true)
-    sendEmail(formData)
-    setIsSubmitted(true)
-    setFormData({ name: "", email: "", company: "", message: "" })
-    setTimeout(() => setIsSubmitted(false), 5000)
-    setTimeout(() => setIsSubmitting(false), 600) // petite pause d'état
+    
+    const result = await sendEmailDirect(formData)
+    
+    if (result.success) {
+      setIsSubmitted(true)
+      setFormData({ name: "", email: "", company: "", message: "" })
+      setTimeout(() => setIsSubmitted(false), 5000)
+    } else {
+      // Afficher l'erreur à l'utilisateur
+      alert(`Erreur lors de l'envoi: ${result.error}`)
+    }
+    
+    setIsSubmitting(false)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -82,16 +96,16 @@ export function ContactSection() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl sm:text-2xl text-foreground">Demande de Consultation</CardTitle>
               <CardDescription className="text-sm sm:text-base">
-                Remplissez ce formulaire et votre application mail s'ouvrira avec votre message pré-rempli.
+                Remplissez ce formulaire et nous recevrons directement votre message par email.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isSubmitted ? (
                 <div className="text-center py-6 md:py-8 animate-fade-in-up">
                   <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-accent mx-auto mb-3 md:mb-4" />
-                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Email ouvert !</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Message envoyé !</h3>
                   <p className="text-sm sm:text-base text-muted-foreground px-4">
-                    Votre application mail s'est ouverte avec le message pré-rempli. Vérifiez et envoyez votre demande.
+                    Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais.
                   </p>
                 </div>
               ) : (
@@ -153,7 +167,7 @@ export function ContactSection() {
                     disabled={isSubmitting}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground animate-pulse-glow text-sm sm:text-base"
                   >
-                    {isSubmitting ? "Ouverture..." : "Envoyer la Demande"}
+                    {isSubmitting ? "Envoi en cours..." : "Envoyer la Demande"}
                     <Send className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                 </form>
