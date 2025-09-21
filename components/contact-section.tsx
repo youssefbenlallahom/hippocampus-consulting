@@ -20,24 +20,35 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Ouvre un brouillon Gmail avec les infos du formulaire
-  function openGmailDraft({ name, email, company, message }: typeof formData) {
+  // Fonction pour détecter si on est sur mobile
+  function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+
+  // Fonction combinée pour envoyer un email selon la plateforme
+  function sendEmail({ name, email, company, message }: typeof formData) {
     const to = "contact@hippocampus-consulting.tn"
-    // Sujet simplifié sans suffixe
     const subject = "Demande de consultation"
-    // Corps: uniquement le message + signature
-    const bodyPlain = `${message}\n\nCordialement,\n${name}`
-    const su = encodeURIComponent(subject)
-    const body = encodeURIComponent(bodyPlain)
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${body}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    const bodyPlain = `${message}\n\nCordialement,\n${name}\nEmail: ${email}${company ? `\nEntreprise: ${company}` : ''}`
+    
+    if (isMobileDevice()) {
+      // Sur mobile : utiliser mailto pour ouvrir l'app mail native
+      const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyPlain)}`
+      window.location.href = mailtoUrl
+    } else {
+      // Sur desktop : garder Gmail
+      const su = encodeURIComponent(subject)
+      const body = encodeURIComponent(bodyPlain)
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${su}&body=${body}`
+      window.open(url, "_blank", "noopener,noreferrer")
+    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.message) return
     setIsSubmitting(true)
-    openGmailDraft(formData)
+    sendEmail(formData)
     setIsSubmitted(true)
     setFormData({ name: "", email: "", company: "", message: "" })
     setTimeout(() => setIsSubmitted(false), 5000)
@@ -52,53 +63,53 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="py-20 bg-muted/30">
+    <section id="contact" className="py-16 md:py-20 bg-muted/30 w-full">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6">
             Contactez <span className="text-primary">Nous</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-balance">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto text-balance px-4">
             Prêt à transformer votre entreprise ? Contactez-nous dès aujourd'hui pour une consultation gratuite et
             découvrez comment nous pouvons vous aider.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 max-w-6xl mx-auto">
           {/* Contact Form */}
           <Card className="animate-fade-in-up">
-            <CardHeader>
-              <CardTitle className="text-2xl text-foreground">Demande de Consultation</CardTitle>
-              <CardDescription>
-                Remplissez ce formulaire et un brouillon Gmail sera ouvert avec votre message.
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl sm:text-2xl text-foreground">Demande de Consultation</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
+                Remplissez ce formulaire et votre application mail s'ouvrira avec votre message pré-rempli.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isSubmitted ? (
-                <div className="text-center py-8 animate-fade-in-up">
-                  <CheckCircle className="w-16 h-16 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Brouillon ouvert !</h3>
-                  <p className="text-muted-foreground">
-                    Un nouvel onglet Gmail s'est ouvert avec votre message pré-rempli. Vérifiez et cliquez sur Envoyer.
+                <div className="text-center py-6 md:py-8 animate-fade-in-up">
+                  <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-accent mx-auto mb-3 md:mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Email ouvert !</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground px-4">
+                    Votre application mail s'est ouverte avec le message pré-rempli. Vérifiez et envoyez votre demande.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Nom complet *</Label>
+                      <Label htmlFor="name" className="text-sm sm:text-base">Nom complet *</Label>
                       <Input
                         id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="transition-all focus:ring-2 focus:ring-primary/20"
+                        className="transition-all focus:ring-2 focus:ring-primary/20 text-sm sm:text-base border-2 border-muted-foreground/30 hover:border-muted-foreground/50 focus:border-primary"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email" className="text-sm sm:text-base">Email *</Label>
                       <Input
                         id="email"
                         name="email"
@@ -106,32 +117,32 @@ export function ContactSection() {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="transition-all focus:ring-2 focus:ring-primary/20"
+                        className="transition-all focus:ring-2 focus:ring-primary/20 text-sm sm:text-base border-2 border-muted-foreground/30 hover:border-muted-foreground/50 focus:border-primary"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="company">Entreprise</Label>
+                    <Label htmlFor="company" className="text-sm sm:text-base">Entreprise</Label>
                     <Input
                       id="company"
                       name="company"
                       value={formData.company}
                       onChange={handleChange}
-                      className="transition-all focus:ring-2 focus:ring-primary/20"
+                      className="transition-all focus:ring-2 focus:ring-primary/20 text-sm sm:text-base border-2 border-muted-foreground/30 hover:border-muted-foreground/50 focus:border-primary"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message *</Label>
+                    <Label htmlFor="message" className="text-sm sm:text-base">Message *</Label>
                     <Textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       required
-                      rows={5}
-                      className="transition-all focus:ring-2 focus:ring-primary/20"
+                      rows={4}
+                      className="transition-all focus:ring-2 focus:ring-primary/20 text-sm sm:text-base resize-none border-2 border-muted-foreground/30 hover:border-muted-foreground/50 focus:border-primary"
                       placeholder="Décrivez vos besoins et objectifs..."
                     />
                   </div>
@@ -140,10 +151,10 @@ export function ContactSection() {
                     type="submit"
                     size="lg"
                     disabled={isSubmitting}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground animate-pulse-glow"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground animate-pulse-glow text-sm sm:text-base"
                   >
                     {isSubmitting ? "Ouverture..." : "Envoyer la Demande"}
-                    <Send className="ml-2 w-5 h-5" />
+                    <Send className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                 </form>
               )}
@@ -151,20 +162,20 @@ export function ContactSection() {
           </Card>
 
           {/* Contact Information */}
-          <div className="space-y-8 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+          <div className="space-y-6 md:space-y-8 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
             {/* Company Info Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">Informations de Contact</CardTitle>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl text-foreground">Informations de Contact</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-primary" />
+              <CardContent className="space-y-4 md:space-y-6">
+                <div className="flex items-start space-x-3 md:space-x-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Adresse</h4>
-                    <p className="text-muted-foreground">
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">Adresse</h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
                       05 Rue Alia Babbou
                       <br />
                       2036 Chotrana 2, Soukra
@@ -174,40 +185,40 @@ export function ContactSection() {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-accent" />
+                <div className="flex items-start space-x-3 md:space-x-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Email</h4>
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">Email</h4>
                     <a
                       href="mailto:contact@hippocampus-consulting.tn"
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm break-all"
                     >
                       contact@hippocampus-consulting.tn
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-primary" />
+                <div className="flex items-start space-x-3 md:space-x-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Téléphone</h4>
-                    <a href="tel:+21658873878" className="text-muted-foreground hover:text-primary transition-colors">
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">Téléphone</h4>
+                    <a href="tel:+21658873878" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm">
                       +216 58 873 878
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-accent" />
+                <div className="flex items-start space-x-3 md:space-x-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Horaires</h4>
-                    <p className="text-muted-foreground">
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base">Horaires</h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm">
                       Lun - Ven: 8h00 - 18h00
                       <br />
                       Sam: 9h00 - 13h00
@@ -219,16 +230,16 @@ export function ContactSection() {
 
             {/* CTA Card */}
             <Card className="bg-primary text-primary-foreground">
-              <CardContent className="p-6 text-center">
-                <h3 className="text-xl font-bold mb-3">Consultation Gratuite</h3>
-                <p className="mb-4 opacity-90">
+              <CardContent className="p-4 md:p-6 text-center">
+                <h3 className="text-lg sm:text-xl font-bold mb-2 md:mb-3">Consultation Gratuite</h3>
+                <p className="mb-3 md:mb-4 opacity-90 text-sm sm:text-base">
                   Bénéficiez d'une première consultation gratuite de 30 minutes pour évaluer vos besoins et définir une
                   stratégie adaptée.
                 </p>
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 w-full sm:w-auto text-sm sm:text-base"
                 >
                   Réserver maintenant
                 </Button>

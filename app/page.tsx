@@ -7,9 +7,9 @@ import { Footer } from "@/components/footer"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
-      <main>
+      <main className="w-full">
         <HeroSection />
         <ServicesSection />
         <AboutSection />
